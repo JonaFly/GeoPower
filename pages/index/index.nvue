@@ -1,0 +1,174 @@
+<template>
+	<div class="container">
+		<div class="page-body">
+			<div class="page-section page-section-gap" v-if="!userState || userState.auth == 1">
+				<map
+					v-if="false"
+					:show-compass="true"
+					:show-location="true"
+					@markertap="handleMarkeTap"
+					:latitude="userLct.latitude"
+					:longitude="userLct.longitude"
+					:markers="cover"
+					:style="{ width: '750rpx', height: mapHeight }"
+				></map>
+			</div>
+			<div v-else>
+				<uni-list>
+					<uni-list-item
+						@click.native="handleUser(item)"
+						:key="index"
+						:title="item.name || '暂未设置名称'"
+						:note="item.pistonObj ? item.pistonObj.address : '暂无定位'"
+						v-for="(item, index) in userList"
+					></uni-list-item>
+					<!-- <uni-list-item title="标题文字" note="描述信息" :show-badge="true" badge-text="12"></uni-list-item> -->
+				</uni-list>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+import { getUserList, getJKphone } from '../../api/user.js';
+export default {
+	data() {
+		return {
+			href: 'https://uniapp.dcloud.io/component/README?id=uniui',
+			id: 0, // 使用 marker点击事件 需要填写id
+			title: 'map',
+			userLct: {
+				user_id: null,
+				latitude: 39.909,
+				longitude: 116.39742,
+				address: ''
+			},
+			covers: [],
+			mapHeight: '851px',
+			userState: {},
+			userList: []
+		};
+	},
+	onLoad() {
+		this.userState = uni.getStorageSync('userInfo');
+		if (this.userState && this.userState.auth == 1) {
+			this.getPhone();
+		}
+	},
+	onShow() {
+		this.getUserSystemHeight();
+		this.getUserLocation();
+	},
+	mounted() {},
+	computed: {
+		cover() {
+			return this.covers;
+		}
+	},
+	methods: {
+		getUserLocation() {
+			// 获取当前用户地理位置
+			uni.getLocation({
+				type: 'wgs84',
+				success: res => {
+					const { latitude, longitude } = res;
+					this.userLct.latitude = latitude;
+					this.userLct.longitude = longitude;
+					// this.$set(this.cover[0], 'longitude', longitude)
+					// this.$set(this.cover[0], 'latitude', latitude)
+					this.covers = [
+						{
+							id: 1,
+							latitude: latitude,
+							longitude: longitude,
+							iconPath: '../../static/location.png'
+						}
+					];
+					let point = new plus.maps.Point(longitude, latitude);
+					plus.maps.Map.reverseGeocode(
+						point,
+						{},
+						event => {
+							let address = event.address; // 转换后的地理位置
+							let point = event.coord; // 转换后的坐标信息
+							let coordType = event.coordType; // 转换后的坐标系类型
+							// console.log(address, 'address-----');
+							//  let reg = /.+?(省|市|自治区|自治州|县|区)/g;
+							//  console.log(address.match(reg));
+							//  this.userLct.address = address
+							//   .match(reg)
+							//   .toString();
+						},
+						function(e) {}
+					);
+				}
+			});
+		},
+		getUserSystemHeight() {
+			uni.getSystemInfo({
+				success: res => {
+					this.mapHeight = `${res.screenHeight - 130}px`;
+				},
+				fail: err => {}
+			});
+			if (this.userState && this.userState.auth == 0) {
+				uni.showLoading({
+					title: '正在加载'
+				});
+				uni.setNavigationBarTitle({
+					title: '用户列表'
+				});
+				getUserList()
+					.then(res => {
+						let data = res.data;
+						let id = this.userState.id;
+						this.userList = [];
+						for (let i = 0; i < data.length; i++) {
+							if (data[i].pid == id) {
+								this.userList.push(data[i]);
+							}
+						}
+						uni.hideLoading();
+					})
+					.catch(_ => {
+						uni.hideLoading();
+					});
+			} else {
+				uni.setNavigationBarTitle({
+					title: '定位'
+				});
+			}
+		},
+		handleMarkeTap() {},
+		handleUser(user) {
+			if (user.pistonObj) {
+				uni.navigateTo({
+					url: `/pages/map_index/map_index?user=${user.name}&ltd=${user.pistonObj.latitude}&lgd=${user.pistonObj.longitude}`
+				});
+			} else {
+				uni.showToast({
+					title: '此用户暂无定位',
+					icon: 'none',
+					positon: 'bottom'
+				});
+			}
+		},
+		getPhone() {
+			getJKphone(uni.getStorageSync('userInfo').pid)
+				.then(res => {
+					uni.setStorageSync('phone', res.data);
+				})
+				.catch(err => {
+					this.getPhone();
+				});
+		}
+	}
+};
+</script>
+
+<style>
+.container {
+	font-size: 14px;
+	line-height: 24px;
+}
+</style>

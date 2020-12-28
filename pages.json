@@ -1,0 +1,82 @@
+{
+	"pages": [{
+		"path": "pages/index/index",
+		"style": {
+			"navigationBarTitleText": "定位",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}, {
+		"path": "pages/login/login",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/login/forget",
+		"style": {
+			"navigationBarTitleText": "修改密码",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}, {
+		"path": "pages/login/register",
+		"style": {
+			"navigationBarTitleText": "添加用户",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}, {
+		"path": "pages/user/user_pts",
+		"style": {
+			"navigationBarTitleText": "",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}, {
+		"path": "pages/my/my",
+		"style": {
+			"navigationBarTitleText": "个人中心",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}, {
+		"path": "pages/map_index/map_index",
+		"style": {
+			"navigationBarTitleText": "",
+			"navigationBarShadow": {
+				"colorType": "grey" //grey|blue|green|orange|red|yellow  
+			}
+		}
+	}],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#666666"
+	},
+	"tabBar": {
+		"color": "#bfbfbf",
+		"selectedColor": "#1296db",
+		"borderStyle": "black",
+		"iconWidth": "24px",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "定位",
+				"iconPath": "static/map_1.png",
+				"selectedIconPath": "static/map.png"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"text": "我的",
+				"iconPath": "static/my_1.png",
+				"selectedIconPath": "static/my.png"
+			}
+		]
+	}
+}
