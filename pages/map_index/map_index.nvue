@@ -1,0 +1,162 @@
+<template>
+	<div class="container">
+		<div class="page-body">
+			<div class="page-section page-section-gap">
+				<map
+					:show-compass="true"
+					:show-location="true"
+					@markertap="handleMarkeTap"
+					:latitude="userLct.latitude"
+					:longitude="userLct.longitude"
+					:markers="cover"
+					:polyline="polyLine"
+					:controls="controls"
+					@controltap="handleControls"
+					:style="{ width: '750rpx', height: mapHeight }"
+				></map>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+import { getUserList } from '../../api/user.js';
+export default {
+	data() {
+		return {
+			href: 'https://uniapp.dcloud.io/component/README?id=uniui',
+			id: 0, // 使用 marker点击事件 需要填写id
+			title: 'map',
+			userLct: {
+				user_id: null,
+				latitude: 39.909,
+				longitude: 116.39742,
+				address: ''
+			},
+			covers: [],
+			mapHeight: '851px',
+			userState: uni.getStorageSync('userInfo'),
+			userList: [],
+			polyLine: [],
+			ltd: '',
+			lgd: '',
+			user: '',
+			controls: [
+				{
+					id: 1,
+					position: {
+						width: 45,
+						left: 320,
+						top: 500,
+						height: 45
+					},
+					iconPath: '../../static/plane.png',
+					clickable: true
+				}
+			]
+		};
+	},
+	onLoad(option) {
+		this.ltd = option.ltd;
+		this.user = option.user;
+		this.lgd = option.lgd;
+		uni.setNavigationBarTitle({
+			title: `${option.user}的位置`
+		});
+		this.covers = [
+			{
+				id: 1,
+				latitude: this.ltd,
+				longitude: this.lgd,
+				iconPath: '../../static/location.png'
+			}
+		];
+	},
+	onShow() {
+		this.getUserSystemHeight();
+		this.getUserLocation();
+	},
+	mounted() {},
+	computed: {
+		cover() {
+			return this.covers;
+		}
+	},
+	methods: {
+		getUserLocation() {
+			// 获取当前用户地理位置
+			uni.getLocation({
+				type: 'wgs84',
+				success: res => {
+					const { latitude, longitude } = res;
+					this.userLct.latitude = latitude;
+					this.userLct.longitude = longitude;
+					// this.$set(this.cover[0], 'longitude', longitude)
+					// this.$set(this.cover[0], 'latitude', latitude)
+					this.polyLine = [
+						{
+							points: [
+								{
+									latitude,
+									longitude
+								},
+								{
+									latitude: this.ltd,
+									longitude: this.lgd
+								}
+							],
+							arrowLine: true,
+							width: 8,
+							color: '#FEAA34'
+						}
+					];
+					let point = new plus.maps.Point(longitude, latitude);
+					plus.maps.Map.reverseGeocode(
+						point,
+						{},
+						event => {
+							let address = event.address; // 转换后的地理位置
+							let point = event.coord; // 转换后的坐标信息
+							let coordType = event.coordType; // 转换后的坐标系类型
+							// console.log(address, 'address-----');
+							//  let reg = /.+?(省|市|自治区|自治州|县|区)/g;
+							//  console.log(address.match(reg));
+							//  this.userLct.address = address
+							//   .match(reg)
+							//   .toString();
+						},
+						function(e) {}
+					);
+				}
+			});
+		},
+		getUserSystemHeight() {
+			uni.getSystemInfo({
+				success: res => {
+					this.mapHeight = `${res.screenHeight - 100}px`;
+				},
+				fail: err => {}
+			});
+		},
+		handleMarkeTap() {},
+		handleControls(e) {
+			if (e.detail.controlId == 1) {
+				uni.openLocation({
+					latitude: Number(this.ltd),
+					longitude: Number(this.lgd),
+					success: function() {
+						console.log('success');
+					}
+				});
+			}
+		}
+	}
+};
+</script>
+
+<style>
+.container {
+	font-size: 14px;
+	line-height: 24px;
+}
+</style>
