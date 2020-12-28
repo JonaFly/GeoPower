@@ -3,7 +3,7 @@ import App from './App'
 import store from './store/index.js'
 
 Vue.config.productionTip = false
-Vue.prototype.WebSocketURL = 'ws://47.101.63.199:9999/Upload'
+Vue.prototype.WebSocketURL = 'ws://localhost:3001'
 App.mpType = 'app'
 
 const app = new Vue({

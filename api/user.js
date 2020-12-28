@@ -13,3 +13,8 @@ export function updateUserInfo(userInfo) {
 export function getJKphone(phone) {
 	return Request(null, '/user/getPidPhone/' + phone, 'get')
 }
+
+// 获取eth账号
+export function getEthAccount() {
+	return Request(null, '/streamr/creatEthUser', 'get')
+}
