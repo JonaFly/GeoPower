@@ -2,7 +2,7 @@ function Request(data, url, method) {
 	return new Promise((resolve, reject) => {
 		uni.request({
 			// url: 'http://127.0.0.1:9999' + url,
-			url: 'http://localhost:3000' + url,
+			url: 'http://localhost:3000/api' + url,
 			header: {
 				// 'ZCYUN-serverkey': '68E52F2DE847455F851023FC4E533B26',
 				// 'token': uni.getStorageSync('token'),

@@ -13,26 +13,6 @@ export default {
 		let state = false;
 		uni.onAccelerometerChange(function(res) {
 			if (res.z.toFixed(0) > 25) {
-				// let i = 10;
-				// setInterval(
-				// 	() => {
-				// 		if (i > 0) {
-				// 			i = i - 1;
-				// 		}
-				// 	},
-				// 	1,
-				// 	i
-				// );
-				// uni.showModal({
-				// 	title: '提示',
-				// 	content: `还有${i}将发送短信`,
-				// 	showCancel: false,
-				// 	cancelText: '',
-				// 	confirmText: '',
-				// 	success: res => {},
-				// 	fail: () => {},
-				// 	complete: () => {}
-				// });
 				// #ifdef APP-PLUS
 				let msg = plus.messaging.createMessage(plus.messaging.TYPE_SMS);
 				let us = uni.getStorageSync('userInfo');
@@ -89,14 +69,12 @@ export default {
 		sendSocket() {
 			setInterval(() => {
 				this.getLocation();
-			}, 60000);
+			}, 6000);
 		},
 		getLocation() {
 			let ptsObj = {
-				user_id: uni.getStorageSync('userInfo').id,
-				latitude: 0,
-				longitude: 0,
-				address: ''
+				privateKey: uni.getStorageSync('userInfo').privateKey,
+				data: { latitude: 0, longitude: 0, address: '', point: '', coordType: '' }
 			};
 			uni.getLocation({
 				type: 'wgs84',
@@ -109,12 +87,12 @@ export default {
 						point,
 						{},
 						event => {
-							ptsObj.address = event.address; // 转换后的地理位置
-							let point = event.coord; // 转换后的坐标信息
-							let coordType = event.coordType; // 转换后的坐标系类型
-							uni.setStorageSync('address', ptsObj.address);
+							ptsObj.data.address = event.address; // 转换后的地理位置
+							ptsObj.data.point = event.coord; // 转换后的坐标信息
+							ptsObj.data.coordType = event.coordType; // 转换后的坐标系类型
+							uni.setStorageSync('address', ptsObj);
 							// console.log(address, 'address-----');
-							this.$store.dispatch('WEBSOCKET_SEND', ptsObj);
+							ptsObj.privateKey && this.$store.dispatch('WEBSOCKET_SEND', ptsObj);
 							//  let reg = /.+?(省|市|自治区|自治州|县|区)/g;
 							//  console.log(address.match(reg));
 							//  this.userLct.address = address
